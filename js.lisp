@@ -527,7 +527,34 @@
 
      (defun reload-calibration-image ()
        (let ((el (get-by-id "calibration")))
-         (setf (slot-value el 'src) (+ "/images/calibration.png?id=" (timestamp))))))))
+         (setf (slot-value el 'src) (+ "/images/calibration.png?id=" (timestamp)))))
+
+     (defun js-ensure-list (x) ; prevent name conflict with metatilities ensure-list
+       (if (= (type-of x) "array")
+         (return x)
+         (return (array x))))
+
+     (defun type-of (o)
+       "Sane typeof operator."
+       ;; http://javascript.crockford.com/remedial.html
+       (let ((type (typeof o)))
+         (cond
+           ((and (=== type "object") o (instanceof o *array))
+            (return "array"))
+           ((=== type "object")
+            (return nil))
+           (t
+            (return type)))))
+
+     (defun set-unselectable (ids)
+      (dolist (id (js-ensure-list ids))
+        (let ((o (get-by-id id)))
+          (when o
+            (console o)
+            (setf (@ o unselectable) "on"
+                  (@ o onselectstart) (lambda () (return false)))
+            (when (@ o style)
+              (setf (@ o style *moz-user-select) "none")))))))))
 
 (defun js-file () *js-file*)
 

@@ -41,24 +41,26 @@
     (:div :style "padding:50px 0 0 100px;"
           (:table
            (:tr (:td) (:td) (:td :align :center
-                                 (:div :class "button" :onclick "request(\"decrease-calibration-width\");"
+                                 (:div :id "b1" :class "button" :onclick "request(\"decrease-calibration-width\");"
                                        "&#x2296")
-                                 (:div :class "button" :onclick "request(\"increase-calibration-width\");"
+                                 (:div :id "b2" :class "button" :onclick "request(\"increase-calibration-width\");"
                                        "&#x2295")))
            (:tr (:td (:div :style "padding-top:10px;")))
            (:tr
             (:td (:table
-                  (:tr (:td (:div :class "button" :onclick "request(\"decrease-calibration-height\");"
+                  (:tr (:td (:div :id "b3" :class "button" :onclick "request(\"decrease-calibration-height\");"
                                   "&#x2296")))
-                  (:tr (:td (:div :class "button" :onclick "request(\"increase-calibration-height\");"
+                  (:tr (:td (:div :id "b4" :class "button" :onclick "request(\"increase-calibration-height\");"
                                   "&#x2295")))))
             (:td (:div :style "padding-right:6px;"))
             (:td (:img :id "calibration" :src (format nil "/images/calibration.png?id=~A" (random-string)))))
            (:tr (:td (:div :style "padding-top:30px;")))
            (:tr (:td) (:td) (:td :align :right
-                                 (:div :class "buttonb"
+                                 (:div :id "b5" :class "buttonb"
                                        :onclick "request(\"finish-calibration\");"
-                                       "Done")))))))
+                                       "Done"))))
+          (:script :type "text/javascript"
+                   (str "setUnselectable([\"b1\",\"b2\",\"b3\",\"b4\",\"b5\"]);")))))
 
 (defun render-main-page (stream)
   (with-html-output (stream)
