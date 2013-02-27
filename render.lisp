@@ -106,10 +106,12 @@
             (:tr :class "headings"
                  (iter (for name in *centers-headers*)
                        (for x from 1)
-                       (unless (or (= x 42)
-                                   (and only-mean (> x 1) (< x 39))
-                                   (and only-centers (> x 11) (< x 39)))
-                         (htm (:td (esc name))))))
+                       (if (and only-mean (= x 1))
+                         (htm (:td))
+                         (unless (or (= x 42)
+                                     (and only-mean (> x 1) (< x 39))
+                                     (and only-centers (> x 11) (< x 39)))
+                           (htm (:td (esc name)))))))
             (unless only-mean
               (iter (with even)
                     (for row in data)
