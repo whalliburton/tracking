@@ -125,21 +125,12 @@
                                             (and only-centers (> x 11) (< x 39)))
                                   (htm (:td (esc val)))))))
                     (setf even (not even))))
-            (iter (for heading in '("mean" "median" "sd" "variance") )
-                  (for fn in (list #'stats:mean #'stats:median #'stats:sd #'stats:variance))
+            (iter (for row in (calculate-statistics data only-mean only-centers))
                   (htm (:tr :class "footings"
-                        (iter (for column in (cdr (rotate-rows data)))
-                              (for x from 1)
-                              (cond
-                                ((= x 1) (htm (:td (esc heading))))
-                                ((or (= x 42)
-                                     (and only-mean (> x 1) (< x 39))
-                                     (and only-centers (> x 11) (< x 39))))
-                                ((> x 11) (htm (:td (fmt
-                                                     "~,2F"
-                                                     (funcall fn (mapcar #'parse-float
-                                                                         (remove-if (lambda (el) (zerop (length el))) column))))) ))
-                                (t (htm (:td)))))))))))
+                            (iter (for column in row)
+                                  (if (numberp column)
+                                    (htm (:td (fmt "~,2F" column)))
+                                    (htm (:td (esc column)))))))))))
 
 (define-page training-data
     "Training Data"

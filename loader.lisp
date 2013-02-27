@@ -3,6 +3,7 @@
 (defparameter *centers-headers* nil)
 (defparameter *centers* nil)
 (defparameter *centers-by-species* nil)
+(defparameter *species-means* nil)
 
 (defun row-species (row)
   (nth 5 row))
@@ -21,6 +22,23 @@
             ((string-equal species "w") (collect row into wolves))
             (t (collect row into dogs))))
         (finally (return (list foxes coyotes wolves dogs)))))
+
+(defun calculate-statistics (rows &optional only-mean only-centers)
+  (iter (for heading in '("mean" "median" "sd" "variance") )
+        (for fn in (list #'stats:mean #'stats:median #'stats:sd #'stats:variance))
+        (collect
+            (iter (for column in (cdr (rotate-rows rows)))
+                  (for x from 1)
+                  (cond
+                    ((= x 1) (collect heading))
+                    ((or (= x 42)
+                         (and only-mean (> x 1) (< x 39))
+                         (and only-centers (> x 11) (< x 39))))
+                    ((> x 11) (collect
+                                (funcall fn (mapcar #'parse-float
+                                                    (remove-if (lambda (el) (zerop (length el)))
+                                                               column)))))
+                    (t (collect nil)))))))
 
 (defun load-data ()
   (let ((raw (iter (for line in (slurp-lines (tracking-file "data/canine-centers.txt")))
