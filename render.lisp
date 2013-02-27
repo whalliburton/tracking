@@ -232,7 +232,7 @@
   "go(\"/\");")
 
 (define-page enter-new-print "Enter a New Print"
-    "Please enter all the valid measurements for the new print."
+    "Please enter the measurements for the new print. It is OK to leave fields blank."
   (:table :class "new-print"
    (:tr (:td  :rowspan 5 :style "virtical-align:middle;" "centers"))
    (:tr (:td) (:td "toe 2") (:td (:input :type "text" :id "t2")) (:td "cm"))
