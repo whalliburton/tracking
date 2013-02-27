@@ -1,14 +1,19 @@
 (in-package :tracking)
 
-(defparameter *tracking-canine-centers-headers* nil)
-(defparameter *tracking-canine-centers* nil)
-(defparameter *tracking-canine-centers-by-species* nil)
+(defparameter *centers-headers* nil)
+(defparameter *centers* nil)
+(defparameter *centers-by-species* nil)
 
 (defun row-species (row)
   (nth 5 row))
 
+(defun row-center-data (row)
+  (let ((raw (copy-list (nthcdr 39 row))))
+    (setf (cdddr raw) (cddddr raw))
+    raw))
+
 (defun split-by-species ()
-  (iter (for row in *tracking-canine-centers*)
+  (iter (for row in *centers*)
         (let ((species (row-species row)))
           (cond
             ((string-equal species "f") (collect row into foxes))
@@ -23,13 +28,13 @@
                            (split-sequence #\tab (string-right-trim '(#\return) line))))
                      (when (= (length columns) 47)
                        (collect columns))))))
-    (setf *tracking-canine-centers-headers*
+    (setf *centers-headers*
           (iter (for a in (first raw))
                 (for b in (second raw))
                 (collect (if (equal a b) a (concatenate 'string a " " b))))
-          *tracking-canine-centers*
+          *centers*
           (iter (for row in (cddr raw))
                 (for index from 0)
                 (collect (cons index row)))
-          *tracking-canine-centers-by-species*
+          *centers-by-species*
           (split-by-species))))

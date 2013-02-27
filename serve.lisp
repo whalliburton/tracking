@@ -83,7 +83,12 @@
           ((string-equal command "show-tab-by-species")
            (show-tab-by-species))
           ((string-equal command "show-tab-by-species-only-mean")
-           (show-tab-by-species-only-mean)))))))
+           (show-tab-by-species-only-mean))
+          ((string-equal command "show-all-data")
+           (show-all-data))
+          ((string-equal command "show-center-data")
+           (show-center-data))
+          (t (error "unknown ajax command ~S" command)))))))
 
 (defmacro with-sessions ((session-id-var session-var) &body body)
   `(iter (for (,session-id-var . ,session-var) in (with-mutex ((session-db-lock *tracking-acceptor*))
