@@ -34,6 +34,8 @@
        ((not (session-value 'calibrated)) (render-calibration-page stream))
        ((eq page :training-data) (render-training-data-page stream))
        ((eq page :training-set) (render-training-set-page stream))
+       ((eq page :enter-new-print) (render-enter-new-print-page stream))
+       ((eq page :view-print) (render-view-print-page stream))
        (t (render-main-page stream))))))
 
 (defmacro define-page (name title help &body body)
@@ -75,6 +77,10 @@
     "Main Menu"
     "Please select from the following options."
   (:table
+   (:tr (:td
+         (:div :style "width:250px;text-align:center;"
+               :class "buttonb" :onclick "request(\"enter-new-print\");" "Enter a New Print")))
+   (:tr (:td (:div :style "padding-top:10px;")))
    (:tr (:td
          (:div :style "width:250px;text-align:center;"
                :class "buttonb" :onclick "request(\"show-training-data\");" "Show Training Data")))
@@ -216,3 +222,78 @@
          (htm
           (:tr (:td (esc heading)) (:td (esc val))))))))))
 
+(defun enter-new-print ()
+  (setf (session-value 'page) :enter-new-print)
+  "go(\"/\");")
+
+(define-page enter-new-print "Enter a New Print"
+    "Please enter all the valid measurements for the new print."
+  (:table :class "new-print"
+   (:tr (:td  :rowspan 5 :style "virtical-align:middle;" "centers"))
+   (:tr (:td) (:td "toe 2") (:td (:input :type "text" :id "t2")) (:td "cm"))
+   (:tr (:td) (:td "toe 3") (:td (:input :type "text" :id "t3")) (:td "cm"))
+   (:tr (:td) (:td "toe 4") (:td (:input :type "text" :id "t4")) (:td "cm"))
+   (:tr (:td) (:td "toe 5") (:td (:input :type "text" :id "t5")) (:td "cm"))
+   (:tr (:td :rowspan 5 :style "virtical-align:middle;" "splays"))
+   (:tr (:td) (:td "1") (:td (:input :type "text" :id "s1")) (:td "cm"))
+   (:tr (:td) (:td "2") (:td (:input :type "text" :id "s2")) (:td "cm"))
+   (:tr (:td) (:td "3") (:td (:input :type "text" :id "s3")) (:td "cm"))
+   (:tr (:td) (:td "4") (:td (:input :type "text" :id "s4")) (:td "cm"))
+   (:tr (:td :style "padding-top:20px;"))
+   (:tr (:td) (:td) (:td) (:td :align :right
+                         (:div :id "b5" :class "buttonb"
+                               :onclick "sendNewPrint();"
+                               "Done")))
+
+   (:script :type "text/javascript" (str "focus(\"t2\");"))))
+
+(defun show-error-dialog (text)
+  (format nil "showDialog(~S);"
+          (with-html-output-to-string (stream)
+            (:div :style "background-color:black;border:1px solid red;padding:10px;"
+                  (:div :style "font-size:24px;" (esc text))
+                  (:div :style "height:20px;")
+                  (:div :class "button"
+                        :onclick "closeDialog();" (esc "Ok"))))))
+
+(defun send-new-print (data)
+  (let ((data
+          (handler-case
+              (iter (for el in (split-sequence #\, (url-decode data)))
+                    (collect (when (plusp (length el)) (parse-float el))))
+            (error ()
+              (return-from send-new-print (show-error-dialog "Error in data."))))))
+    (destructuring-bind (t2 t3 t4 t5 s1 s2 s3 s4) data
+      (let ((id (deck:add-node "demo:print" `(("t2" ,t2)
+                                              ("t3" ,t3)
+                                              ("t4" ,t4)
+                                              ("t5" ,t5)
+                                              ("s1" ,s1)
+                                              ("s2" ,s2)
+                                              ("s3" ,s3)
+                                              ("s4" ,s4)))))
+        (setf (session-value 'page) :view-print
+              (session-value 'print-id) id))))
+  "go(\"/\");")
+
+(define-page view-print
+    "View Print"
+    nil
+  (:div :style "width:300px;text-align:center;"
+        :class "buttonb" :onclick "request(\"show-main-menu\");" "Go back to the main menu")
+  (:div :style "padding-top:40px;")
+  (let* ((id (session-value 'print-id))
+         (node (deck:get-node id)))
+    (with-field-values (t2 t3 t4 t5 s1 s2 s3 s4) node
+      (htm (:table :class "view-print"
+                   (:tr (:td  :rowspan 5 :style "virtical-align:middle;" "centers"))
+                   (:tr (:td) (:td "toe 2") (:td (fmt "~,2F" t2)) (:td "cm"))
+                   (:tr (:td) (:td "toe 3") (:td (fmt "~,2F" t3)) (:td "cm"))
+                   (:tr (:td) (:td "toe 4") (:td (fmt "~,2F" t4)) (:td "cm"))
+                   (:tr (:td) (:td "toe 5") (:td (fmt "~,2F" t5)) (:td "cm"))
+                   (:tr (:td :rowspan 5 :style "virtical-align:middle;" "splays"))
+                   (:tr (:td) (:td "1") (:td (fmt "~,2F" s1)) (:td "cm"))
+                   (:tr (:td) (:td "2") (:td (fmt "~,2F" s2)) (:td "cm"))
+                   (:tr (:td) (:td "3") (:td (fmt "~,2F" s3)) (:td "cm"))
+                   (:tr (:td) (:td "4") (:td (fmt "~,2F" s4)) (:td "cm"))
+                   (:tr (:td :style "padding-top:20px;")))))))))

@@ -354,7 +354,25 @@
               (setf (@ o style *moz-user-select) "none"))))))
 
      (defun select-training-set (index)
-       (request "select-training-set" (create :index index))))))
+       (request "select-training-set" (create :index index)))
+
+     (defun-trace input-value (id)
+      (return (slot-value (get-by-id id) 'value)))
+
+     (defun send-new-print ()
+       (request "send-new-print"
+                (create :data
+                        (list (input-value "t2")
+                              (input-value "t3")
+                              (input-value "t4")
+                              (input-value "t5")
+                              (input-value "s1")
+                              (input-value "s2")
+                              (input-value "s3")
+                              (input-value "s4")))))
+
+     (defun focus (id)
+       ((@ (@ (get-by-id id)) focus))))))
 
 (defun js-file () *js-file*)
 

@@ -88,6 +88,10 @@
            (show-all-data))
           ((string-equal command "show-center-data")
            (show-center-data))
+          ((string-equal command "enter-new-print")
+           (enter-new-print))
+          ((string-equal command "send-new-print")
+           (apply #'send-new-print (with-args :data)))
           (t (error "unknown ajax command ~S" command)))))))
 
 (defmacro with-sessions ((session-id-var session-var) &body body)

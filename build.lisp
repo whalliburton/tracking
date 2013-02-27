@@ -5,10 +5,15 @@
   (start-printer-session))
 
 (defparameter *templates*
-  '(("tag" (("name" :string))))
-  ;; '(("day" (("start" :date)))
-  ;;   ("starting" "event" "day" nil (("time" :date))))
-  )
+  '(("print" (("name" :string)
+              ("t2" :float :validation (:allow-nil t))
+              ("t3" :float :validation (:allow-nil t))
+              ("t4" :float :validation (:allow-nil t))
+              ("t5" :float :validation (:allow-nil t))
+              ("s1" :float :validation (:allow-nil t))
+              ("s2" :float :validation (:allow-nil t))
+              ("s3" :float :validation (:allow-nil t))
+              ("s4" :float :validation (:allow-nil t))))))
 
 (defun create-templates ()
   (when *templates*

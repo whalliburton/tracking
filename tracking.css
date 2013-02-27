@@ -102,4 +102,13 @@ tr.footings td { background-color:#020;cursor:auto; }
 div.buttonc { display:inline-block;padding:5px 13px 5px 13px;border:1px solid #444;cursor:pointer;font-size:24px;}
 div.buttonc:hover { background-color:#555; }
 
-div.buttond { display:inline-block;padding:5px 13px 5px 13px;border:1px solid #444;cursor:pointer;font-size:24px; background-color:#444; }}
+div.buttond { display:inline-block;padding:5px 13px 5px 13px;border:1px solid #444;cursor:pointer;font-size:24px; background-color:#444; }
+
+input[type=text] { padding:5px;border:1px solid #777;color:white;background-color:black;
+                  font-size:24px; }
+
+table.new-print { font-size:24px;border-collapse:collapse;}
+.new-print td { padding-right: 20px; padding-bottom:5px;}
+
+table.view-print { font-size:24px;border-collapse:collapse;}
+.view-print td { padding-right: 20px; padding-bottom:5px; text-align:right;}
