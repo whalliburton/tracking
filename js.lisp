@@ -351,7 +351,10 @@
             (setf (@ o unselectable) "on"
                   (@ o onselectstart) (lambda () (return false)))
             (when (@ o style)
-              (setf (@ o style *moz-user-select) "none")))))))))
+              (setf (@ o style *moz-user-select) "none"))))))
+
+     (defun select-training-set (index)
+       (request "select-training-set" (create :index index))))))
 
 (defun js-file () *js-file*)
 

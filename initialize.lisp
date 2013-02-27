@@ -10,6 +10,7 @@
   (ensure-directories-exist (tracking-file "logs/"))
   (start-session)
   (build)
+  (load-data)
   (start-tracking))
 
 (defmethod hunchentoot:maybe-invoke-debugger ((condition usocket:timeout-error))

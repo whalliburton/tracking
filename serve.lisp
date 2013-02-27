@@ -71,7 +71,19 @@
           ((string-equal command "finish-calibration")
            (finish-calibration))
           ((string-equal command "recalibrate")
-           (recalibrate)))))))
+           (recalibrate))
+          ((string-equal command "show-training-data")
+           (show-training-data))
+          ((string-equal command "show-main-menu")
+           (show-main-menu))
+          ((string-equal command "select-training-set")
+           (apply #'select-training-set (with-args :index)))
+          ((string-equal command "show-tab-all-together")
+           (show-tab-all-together))
+          ((string-equal command "show-tab-by-species")
+           (show-tab-by-species))
+          ((string-equal command "show-tab-by-species-only-mean")
+           (show-tab-by-species-only-mean)))))))
 
 (defmacro with-sessions ((session-id-var session-var) &body body)
   `(iter (for (,session-id-var . ,session-var) in (with-mutex ((session-db-lock *tracking-acceptor*))
@@ -136,3 +148,7 @@
     (format t "no sessions~%")))
 
 (defalias w list-sessions)
+
+(defun reset-sessions ()
+  (let ((hunchentoot:*acceptor* *tracking-acceptor*))
+    (hunchentoot:reset-sessions)))

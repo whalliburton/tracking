@@ -89,3 +89,17 @@ div.button:hover { background-color:#555; }
 div.buttonb { display:inline-block;padding:5px 13px 5px 13px;border:1px solid #444;cursor:pointer;font-size:24px;}
 div.buttonb:hover { background-color:#555; }
 
+tr.odd { background-color:#222; }
+
+.training-data td { padding:4px 15px 4px 4px; cursor:pointer; text-align:right;}
+.training-data tr:hover { background-color:#444; }
+tr.headings td { background-color:#003;cursor:auto; }
+tr.headings:hover { background-color:#003; }
+.training-set tr:hover { background-color:#444; }
+.training-set td { padding:4px 15px 4px 4px; }
+tr.footings td { background-color:#020;cursor:auto; }
+
+div.buttonc { display:inline-block;padding:5px 13px 5px 13px;border:1px solid #444;cursor:pointer;font-size:24px;}
+div.buttonc:hover { background-color:#555; }
+
+div.buttond { display:inline-block;padding:5px 13px 5px 13px;border:1px solid #444;cursor:pointer;font-size:24px; background-color:#444; }}
