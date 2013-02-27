@@ -119,8 +119,8 @@
                                 (unless (= x 42)
                                   (htm (:td (esc val)))))))
                     (setf even (not even))))
-            (iter (for heading in '("mean" "median" "sd"))
-                  (for fn in (list #'stats:mean #'stats:median #'stats:sd))
+            (iter (for heading in '("mean" "median" "sd" "variance") )
+                  (for fn in (list #'stats:mean #'stats:median #'stats:sd #'stats:variance))
                   (htm (:tr :class "footings"
                         (iter (for column in (cdr (rotate-rows data)))
                               (for index from 0)
