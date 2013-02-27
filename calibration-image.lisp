@@ -13,7 +13,7 @@
 
 (defun calibration-image-dispatch ()
   (setf (hunchentoot:content-type*) "image/png")
-  (multiple-value-bind (width height) (calibration-width-heigth)
+  (multiple-value-bind (width height) (calibration-width-height)
       (with-canvas (:width width :height height)
         (let ((font (get-font (tracking-file "terminus.ttf"))))
           (set-font font 32)
@@ -33,25 +33,25 @@
             (save-png-stream stream))))))
 
 (defun increase-calibration-width ()
-  (multiple-value-bind (width height) (calibration-width-heigth)
+  (multiple-value-bind (width height) (calibration-width-height)
     (setf (session-value 'calibration)
           (list (1+ width) height)))
   "reloadCalibrationImage();")
 
 (defun increase-calibration-height ()
-  (multiple-value-bind (width height) (calibration-width-heigth)
+  (multiple-value-bind (width height) (calibration-width-height)
     (setf (session-value 'calibration)
           (list width (1+ height))))
   "reloadCalibrationImage();")
 
 (defun decrease-calibration-width ()
-  (multiple-value-bind (width height) (calibration-width-heigth)
+  (multiple-value-bind (width height) (calibration-width-height)
     (setf (session-value 'calibration)
           (list (max (1- width) 1) height)))
   "reloadCalibrationImage();")
 
 (defun decrease-calibration-height ()
-  (multiple-value-bind (width height) (calibration-width-heigth)
+  (multiple-value-bind (width height) (calibration-width-height)
     (setf (session-value 'calibration)
           (list width (max (1- height) 1))))
   "reloadCalibrationImage();")
