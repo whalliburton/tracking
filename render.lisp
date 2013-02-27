@@ -36,6 +36,7 @@
        ((eq page :training-set) (render-training-set-page stream))
        ((eq page :enter-new-print) (render-enter-new-print-page stream))
        ((eq page :view-print) (render-view-print-page stream))
+       ((eq page :view-all-prints) (render-view-all-prints-page stream))
        (t (render-main-page stream))))))
 
 (defmacro define-page (name title help &body body)
@@ -77,6 +78,10 @@
     "Main Menu"
     "Please select from the following options."
   (:table
+   (:tr (:td
+         (:div :style "width:250px;text-align:center;"
+               :class "buttonb" :onclick "request(\"show-all-prints\");" "View All Prints")))
+   (:tr (:td (:div :style "padding-top:10px;")))
    (:tr (:td
          (:div :style "width:250px;text-align:center;"
                :class "buttonb" :onclick "request(\"enter-new-print\");" "Enter a New Print")))
@@ -280,7 +285,11 @@
     "View Print"
     nil
   (:div :style "width:300px;text-align:center;"
-        :class "buttonb" :onclick "request(\"show-main-menu\");" "Go back to the main menu")
+        :class "buttonb" :onclick "request(\"show-all-prints\");" "Go back to the print table")
+  (:div :style "padding-top:40px;")
+  (:div :style "width:300px;text-align:center;"
+        :class "buttonb" :onclick (format nil "deletePrint(~A);" (session-value 'print-id))
+        "Delete this print")
   (:div :style "padding-top:40px;")
   (let* ((id (session-value 'print-id))
          (node (deck:get-node id)))
@@ -297,3 +306,58 @@
                    (:tr (:td) (:td "3") (:td (fmt "~,2F" s3)) (:td "cm"))
                    (:tr (:td) (:td "4") (:td (fmt "~,2F" s4)) (:td "cm"))
                    (:tr (:td :style "padding-top:20px;")))))))))
+
+(defparameter +time-format+
+  '(:month #\/(:day 2) #\/ (:year 4)))
+
+(define-page view-all-prints
+    "View All Prints"
+    nil
+  (:div :style "width:300px;text-align:center;"
+        :class "buttonb" :onclick "request(\"show-main-menu\");" "Go back to the main menu")
+  (:div :style "padding-top:40px;")
+  (let ((prints (deck:search "demo:print")))
+    (if prints
+      (htm
+       (:table :class "all-prints"
+               (:tr :class "headings" (:td)
+                    (:td :style "text-align:center;" :colspan 4 "centers")
+                    (:td :style "text-align:center;" :colspan 4 "splays" ))
+               (:tr :class "headings"
+                    (:td "created")
+                    (:td "toe 2") (:td "toe 3") (:td "toe 4") (:td "toe 5")
+                    (:td "1") (:td "2") (:td "3") (:td "4"))
+               (iter
+                (with even)
+                (for print in prints)
+                (with-field-values (t2 t3 t4 t5 s1 s2 s3 s4) print
+                  (htm (:tr
+                        :onclick (format nil "selectPrint(~A);" (id print))
+                        :class (if even "odd" "even")
+                        (:td (esc (format-timestring nil (inception print) :format +time-format+)))
+                        (:td (str (if t2 (format nil "~,2F" t2) "")))
+                        (:td (str (if t3 (format nil "~,2F" t3) "")))
+                        (:td (str (if t4 (format nil "~,2F" t4) "")))
+                        (:td (str (if t5 (format nil "~,2F" t5) "")))
+                        (:td (str (if s1 (format nil "~,2F" s1) "")))
+                        (:td (str (if s2 (format nil "~,2F" s2) "")))
+                        (:td (str (if s3 (format nil "~,2F" s3) "")))
+                        (:td (str (if s4 (format nil "~,2F" s4) ""))))))
+                (setf even (not even)))))
+      (htm (:div :style "font-size:24px;" "There are no prints.")))))
+
+(defun show-all-prints ()
+  (setf (session-value 'page) :view-all-prints)
+  "go(\"/\");")
+
+(defun select-print (id)
+  (let ((id (parse-integer id)))
+    (setf (session-value 'page) :view-print
+          (session-value 'print-id) id)
+    "go(\"/\");"))
+
+(defun delete-print (id)
+  (let ((id (parse-integer id)))
+    (deck:delete-node id)
+    (setf (session-value 'page) :view-all-prints)
+    "go(\"/\");"))

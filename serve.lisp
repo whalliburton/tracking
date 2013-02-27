@@ -92,6 +92,12 @@
            (enter-new-print))
           ((string-equal command "send-new-print")
            (apply #'send-new-print (with-args :data)))
+          ((string-equal command "show-all-prints")
+           (show-all-prints))
+          ((string-equal command "select-print")
+           (apply #'select-print (with-args :id)))
+          ((string-equal command "delete-print")
+           (apply #'delete-print (with-args :id)))
           (t (error "unknown ajax command ~S" command)))))))
 
 (defmacro with-sessions ((session-id-var session-var) &body body)

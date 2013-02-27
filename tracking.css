@@ -112,3 +112,9 @@ table.new-print { font-size:24px;border-collapse:collapse;}
 
 table.view-print { font-size:24px;border-collapse:collapse;}
 .view-print td { padding-right: 20px; padding-bottom:5px; text-align:right;}
+
+table.all-prints { font-size:24px;border-collapse:collapse;}
+.all-prints td { padding-right: 20px; padding-bottom:5px; text-align:right;}
+
+.all-prints tr:hover { background-color:#444; }
+.all-prints td { padding:4px 15px 4px 4px; }

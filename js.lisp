@@ -372,7 +372,13 @@
                               (input-value "s4")))))
 
      (defun focus (id)
-       ((@ (@ (get-by-id id)) focus))))))
+       ((@ (@ (get-by-id id)) focus)))
+
+     (defun select-print (id)
+       (request "select-print" (create :id id)))
+
+     (defun delete-print (id)
+       (request "delete-print" (create :id id))))))
 
 (defun js-file () *js-file*)
 
