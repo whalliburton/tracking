@@ -55,4 +55,9 @@
                 (for index from 0)
                 (collect (cons index row)))
           *centers-by-species*
-          (split-by-species))))
+          (split-by-species)
+          *species-means*
+          (iter (for species in *centers-by-species*)
+                (collect (subseq (first (calculate-statistics species)) 38))))))
+
+

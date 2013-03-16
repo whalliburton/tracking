@@ -2,6 +2,7 @@
   :serial t
   :components ((:static-file "tracking.asd")
                (:file "package")
+               (:file "rpc-sail")
                (:file "utility")
                (:file "icons")
                (:file "loader")

@@ -1,7 +1,7 @@
 (in-package :tracking)
 
 (defun start-session ()
-  (setf *deck-id* (start-deck-session "demo" "demo"))
+  (setf *deck-id* (start-deck-session "tracking" "07D513B21ADDCB4CE" :possibly-create-user t))
   (start-printer-session))
 
 (defparameter *templates*
@@ -13,7 +13,11 @@
               ("s1" :float :validation (:allow-nil t))
               ("s2" :float :validation (:allow-nil t))
               ("s3" :float :validation (:allow-nil t))
-              ("s4" :float :validation (:allow-nil t))))))
+              ("s4" :float :validation (:allow-nil t))
+              ("fs" :float :validation (:allow-nil t))
+              ("cs" :float :validation (:allow-nil t))
+              ("ws" :float :validation (:allow-nil t))
+              ("ds" :float :validation (:allow-nil t))))))
 
 (defun create-templates ()
   (when *templates*

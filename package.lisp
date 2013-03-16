@@ -2,7 +2,6 @@
 (defpackage tracking
   (:use common-lisp deck-client iterate vecto)
   (:import-from sb-thread with-mutex)
-  (:import-from lhstats with-mutex)
   (:import-from cl-who with-html-output-to-string with-html-output htm str esc fmt)
   (:import-from alexandria with-input-from-file when-let if-let with-output-to-file)
   (:import-from hunchentoot session-value session-db-lock session-db *session*

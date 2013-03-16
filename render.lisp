@@ -140,7 +140,7 @@
                   (htm (:tr :class "footings"
                             (iter (for column in row)
                                   (if (numberp column)
-                                    (htm (:td (fmt "~,2F" column)))
+                                    (htm (:td (fmt "~,1F" column)))
                                     (htm (:td (esc column)))))))))))
 
 (define-page training-data
@@ -235,20 +235,23 @@
     "Please enter the measurements for the new print. It is OK to leave fields blank."
   (:table :class "new-print"
    (:tr (:td  :rowspan 5 :style "virtical-align:middle;" "centers"))
-   (:tr (:td) (:td "toe 2") (:td (:input :type "text" :id "t2")) (:td "cm"))
-   (:tr (:td) (:td "toe 3") (:td (:input :type "text" :id "t3")) (:td "cm"))
-   (:tr (:td) (:td "toe 4") (:td (:input :type "text" :id "t4")) (:td "cm"))
-   (:tr (:td) (:td "toe 5") (:td (:input :type "text" :id "t5")) (:td "cm"))
+   (:tr (:td) (:td "toe 2") (:td (:input :type "text" :id "t2")) (:td "mm"))
+   (:tr (:td) (:td "toe 3") (:td (:input :type "text" :id "t3")) (:td "mm"))
+   (:tr (:td) (:td "toe 4") (:td (:input :type "text" :id "t4")) (:td "mm"))
+   (:tr (:td) (:td "toe 5") (:td (:input :type "text" :id "t5")) (:td "mm"))
    (:tr (:td :rowspan 5 :style "virtical-align:middle;" "splays"))
-   (:tr (:td) (:td "1") (:td (:input :type "text" :id "s1")) (:td "cm"))
-   (:tr (:td) (:td "2") (:td (:input :type "text" :id "s2")) (:td "cm"))
-   (:tr (:td) (:td "3") (:td (:input :type "text" :id "s3")) (:td "cm"))
-   (:tr (:td) (:td "4") (:td (:input :type "text" :id "s4")) (:td "cm"))
+   (:tr (:td) (:td "1") (:td (:input :type "text" :id "s1")) (:td "mm"))
+   (:tr (:td) (:td "2") (:td (:input :type "text" :id "s2")) (:td "mm"))
+   (:tr (:td) (:td "3") (:td (:input :type "text" :id "s3")) (:td "mm"))
+   (:tr (:td) (:td "4") (:td (:input :type "text" :id "s4")) (:td "mm"))
    (:tr (:td :style "padding-top:20px;"))
    (:tr (:td) (:td) (:td) (:td :align :right
-                         (:div :id "b5" :class "buttonb"
-                               :onclick "sendNewPrint();"
-                               "Done")))
+                               (:div :id "b5" :class "buttonb"
+                                     :onclick "sendNewPrint();"
+                                     "Done")
+                               (:span :style "padding-right:10px;")
+                               (:div :id "b5" :class "buttonb"
+                               :onclick "request(\"show-all-prints\");" "Cancel")))
 
    (:script :type "text/javascript" (str "focus(\"t2\");"))))
 
@@ -269,17 +272,33 @@
             (error ()
               (return-from send-new-print (show-error-dialog "Error in data."))))))
     (destructuring-bind (t2 t3 t4 t5 s1 s2 s3 s4) data
-      (let ((id (deck:add-node "demo:print" `(("t2" ,t2)
-                                              ("t3" ,t3)
-                                              ("t4" ,t4)
-                                              ("t5" ,t5)
-                                              ("s1" ,s1)
-                                              ("s2" ,s2)
-                                              ("s3" ,s3)
-                                              ("s4" ,s4)))))
+      (let ((id (deck:add-node "tracking:print" `(("t2" ,t2)
+                                                  ("t3" ,t3)
+                                                  ("t4" ,t4)
+                                                  ("t5" ,t5)
+                                                  ("s1" ,s1)
+                                                  ("s2" ,s2)
+                                                  ("s3" ,s3)
+                                                  ("s4" ,s4)
+                                                  ("fs" ,(calculate-score 0 data))
+                                                  ("cs" ,(calculate-score 1 data))
+                                                  ("ws" ,(calculate-score 2 data))
+                                                  ("ds" ,(calculate-score 3 data))))))
         (setf (session-value 'page) :view-print
               (session-value 'print-id) id))))
   "go(\"/\");")
+
+;; Euclidian distance from the means
+(defun calculate-score (species data)
+  (let ((means (nth species *species-means*)))
+    (let ((base
+            (iter (for el in data)
+                  (for mean in means)
+                  (when el
+                    (summing (* (- el mean) (- el mean)))))))
+      (if base
+        (sqrt base)
+        0))))
 
 (define-page view-print
     "View Print"
@@ -293,19 +312,24 @@
   (:div :style "padding-top:40px;")
   (let* ((id (session-value 'print-id))
          (node (deck:get-node id)))
-    (with-field-values (t2 t3 t4 t5 s1 s2 s3 s4) node
+    (with-field-values (t2 t3 t4 t5 s1 s2 s3 s4 fs cs ws ds) node
       (htm (:table :class "view-print"
                    (:tr (:td  :rowspan 5 :style "virtical-align:middle;" "centers"))
-                   (:tr (:td) (:td "toe 2") (:td (fmt "~,2F" t2)) (:td "cm"))
-                   (:tr (:td) (:td "toe 3") (:td (fmt "~,2F" t3)) (:td "cm"))
-                   (:tr (:td) (:td "toe 4") (:td (fmt "~,2F" t4)) (:td "cm"))
-                   (:tr (:td) (:td "toe 5") (:td (fmt "~,2F" t5)) (:td "cm"))
+                   (:tr (:td) (:td "toe 2") (:td (fmt "~,1F" t2)) (:td "mm"))
+                   (:tr (:td) (:td "toe 3") (:td (fmt "~,1F" t3)) (:td "mm"))
+                   (:tr (:td) (:td "toe 4") (:td (fmt "~,1F" t4)) (:td "mm"))
+                   (:tr (:td) (:td "toe 5") (:td (fmt "~,1F" t5)) (:td "mm"))
                    (:tr (:td :rowspan 5 :style "virtical-align:middle;" "splays"))
-                   (:tr (:td) (:td "1") (:td (fmt "~,2F" s1)) (:td "cm"))
-                   (:tr (:td) (:td "2") (:td (fmt "~,2F" s2)) (:td "cm"))
-                   (:tr (:td) (:td "3") (:td (fmt "~,2F" s3)) (:td "cm"))
-                   (:tr (:td) (:td "4") (:td (fmt "~,2F" s4)) (:td "cm"))
-                   (:tr (:td :style "padding-top:20px;")))))))))
+                   (:tr (:td) (:td "1") (:td (fmt "~,1F" s1)) (:td "mm"))
+                   (:tr (:td) (:td "2") (:td (fmt "~,1F" s2)) (:td "mm"))
+                   (:tr (:td) (:td "3") (:td (fmt "~,1F" s3)) (:td "mm"))
+                   (:tr (:td) (:td "4") (:td (fmt "~,1F" s4)) (:td "mm"))
+                   (:tr (:td :rowspan 5 :style "virtical-align:middle;" "scores"))
+                   (:tr (:td) (:td "fox") (:td (fmt "~,1F" fs)))
+                   (:tr (:td) (:td "coyote") (:td (fmt "~,1F" cs)))
+                   (:tr (:td) (:td "wolf") (:td (fmt "~,1F" ws)))
+                   (:tr (:td) (:td "dog") (:td (fmt "~,1F" ds)))
+                   (:tr (:td :style "padding-top:20px;")))))))
 
 (defparameter +time-format+
   '(:month #\/(:day 2) #\/ (:year 4)))
@@ -315,34 +339,44 @@
     nil
   (:div :style "width:300px;text-align:center;"
         :class "buttonb" :onclick "request(\"show-main-menu\");" "Go back to the main menu")
-  (:div :style "padding-top:40px;")
+  (:div :style "padding-top:20px;")
+  (:div :style "width:300px;text-align:center;"
+        :class "buttonb" :onclick "request(\"enter-new-print\");" "Enter a New Print")
+  (:div :style "padding-top:30px;")
   (let ((prints (deck:search "demo:print")))
     (if prints
       (htm
        (:table :class "all-prints"
                (:tr :class "headings" (:td)
                     (:td :style "text-align:center;" :colspan 4 "centers")
-                    (:td :style "text-align:center;" :colspan 4 "splays" ))
+                    (:td :style "text-align:center;" :colspan 4 "splays" )
+                    (:td :style "text-align:center;" :colspan 4 "scores" ))
                (:tr :class "headings"
                     (:td "created")
                     (:td "toe 2") (:td "toe 3") (:td "toe 4") (:td "toe 5")
-                    (:td "1") (:td "2") (:td "3") (:td "4"))
+                    (:td "1") (:td "2") (:td "3") (:td "4")
+                    (:td "fox") (:td "coyote") (:td "wolf") (:td "dog"))
                (iter
                 (with even)
                 (for print in prints)
-                (with-field-values (t2 t3 t4 t5 s1 s2 s3 s4) print
+                (with-field-values (t2 t3 t4 t5 s1 s2 s3 s4 fs cs ws ds) print
                   (htm (:tr
+                        :style "cursor:pointer"
                         :onclick (format nil "selectPrint(~A);" (id print))
                         :class (if even "odd" "even")
                         (:td (esc (format-timestring nil (inception print) :format +time-format+)))
-                        (:td (str (if t2 (format nil "~,2F" t2) "")))
-                        (:td (str (if t3 (format nil "~,2F" t3) "")))
-                        (:td (str (if t4 (format nil "~,2F" t4) "")))
-                        (:td (str (if t5 (format nil "~,2F" t5) "")))
-                        (:td (str (if s1 (format nil "~,2F" s1) "")))
-                        (:td (str (if s2 (format nil "~,2F" s2) "")))
-                        (:td (str (if s3 (format nil "~,2F" s3) "")))
-                        (:td (str (if s4 (format nil "~,2F" s4) ""))))))
+                        (:td (str (if t2 (format nil "~,1F" t2) "")))
+                        (:td (str (if t3 (format nil "~,1F" t3) "")))
+                        (:td (str (if t4 (format nil "~,1F" t4) "")))
+                        (:td (str (if t5 (format nil "~,1F" t5) "")))
+                        (:td (str (if s1 (format nil "~,1F" s1) "")))
+                        (:td (str (if s2 (format nil "~,1F" s2) "")))
+                        (:td (str (if s3 (format nil "~,1F" s3) "")))
+                        (:td (str (if s4 (format nil "~,1F" s4) "")))
+                        (:td (str (if fs (format nil "~,1F" fs) "")))
+                        (:td (str (if fs (format nil "~,1F" cs) "")))
+                        (:td (str (if fs (format nil "~,1F" ws) "")))
+                        (:td (str (if fs (format nil "~,1F" ds) ""))))))
                 (setf even (not even)))))
       (htm (:div :style "font-size:24px;" "There are no prints.")))))
 
